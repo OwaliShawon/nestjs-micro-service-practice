@@ -1,0 +1,35 @@
+# architect.yml
+name: examples/nestjs-simple-client
+description: Client used to test the connection to the simple NestJS microservice
+keywords:
+  - nestjs
+  - examples
+  - microservice
+  - client
+
+# Sets up the connection to our previous microservice
+dependencies:
+  examples/nestjs-simple: latest
+
+services:
+  client:
+    build:
+      context: ./
+    interfaces:
+      main: 3000
+    environment:
+      # Dyanmically enriches our environment variables with the location of the other microservice
+      HELLO_SERVICE_HOST: ${{ dependencies['examples/nestjs-simple'].interfaces.main.host }}
+      HELLO_SERVICE_PORT: ${{ dependencies['examples/nestjs-simple'].interfaces.main.port }}
+    debug:
+      command: npm run start:dev
+      volumes:
+        src:
+          host_path: ./src/
+          mount_path: /usr/src/app/src/
+
+# Exposes our new REST API to upstream traffic
+interfaces:
+  client:
+    description: Exposes the REST API to upstream traffic
+    url: ${{ services.client.interfaces.main.url }}

@@ -1,0 +1,33 @@
+# Meta data describing our component so others can discover and reference it
+name: examples/nestjs-simple
+description: Simple NestJS microservice that uses TCP for inter-process communication
+keywords:
+  - nestjs
+  - examples
+  - tcp
+  - microservices
+
+# List of microservices powering our component
+services:
+  api:
+  	# Specify where the source code is for the service
+    build:
+      context: ./
+    # Specify the port and protocol the service listens on
+    interfaces:
+      main:
+        port: 8080
+        protocol: tcp
+    # Mount our src directory to the container and use our dev command so we get hot-reloading
+    debug:
+      command: npm run start:dev
+      volumes:
+        src:
+          host_path: ./src/
+          mount_path: /usr/src/app/src/
+
+# List of interfaces our component allows others to connect to
+interfaces:
+  main:
+    description: Exposes the API to upstream traffic
+    url: ${{ services.api.interfaces.main.url }}
